@@ -1,25 +1,56 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useState } from 'react';
+import './style.css';
+import NoteInput from './components/NoteInput';
+import NoteList from './components/NoteList';
 
-function App() {
+function NoteTakingApp() {
+  const [notes, setNotes] = useState([]);
+  const [currentNote, setCurrentNote] = useState('');
+  const [editingNoteIndex, setEditingNoteIndex] = useState(null);
+
+  const handleAddNote = () => {
+    if (currentNote.trim() !== '') {
+      setNotes([...notes, currentNote]);
+      setCurrentNote('');
+    }
+  };
+
+  const handleEditNote = (index) => {
+    setCurrentNote(notes[index]);
+    setEditingNoteIndex(index);
+  };
+
+  const handleUpdateNote = () => {
+    if (currentNote.trim() !== '') {
+      const updatedNotes = [...notes];
+      updatedNotes[editingNoteIndex] = currentNote;
+      setNotes(updatedNotes);
+      setCurrentNote('');
+      setEditingNoteIndex(null);
+    }
+  };
+
+  const handleDeleteNote = (index) => {
+    const updatedNotes = notes.filter((_, i) => i !== index);
+    setNotes(updatedNotes);
+  };
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div className="note-taking-app">
+      <h1 className='title'>Note Taking App</h1>
+      <NoteInput
+        value={currentNote}
+        onChange={(e) => setCurrentNote(e.target.value)}
+        onSubmit={editingNoteIndex !== null ? handleUpdateNote : handleAddNote}
+        isEditing={editingNoteIndex !== null}
+      />
+      <NoteList
+        notes={notes}
+        onEdit={handleEditNote}
+        onDelete={handleDeleteNote}
+      />
     </div>
   );
 }
 
-export default App;
+export default NoteTakingApp;
